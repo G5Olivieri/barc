@@ -1,0 +1,111 @@
+{
+  "barbers": [
+    {
+      "id": "1",
+      "name": "John Doe",
+      "services": [
+        1,
+        2,
+        3
+      ],
+      "availability": {
+        "weekdays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "officehour": "08:00-12:00,13:00-18:00"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Jane Doe",
+      "services": [
+        1,
+        2
+      ],
+      "availability": {
+        "weekdays": [
+          0,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "officehour": "08:00-12:00,13:00-18:00"
+      }
+    }
+  ],
+  "services": [
+    {
+      "id": "1",
+      "name": "Barba",
+      "price": 15,
+      "duration": 15
+    },
+    {
+      "id": "2",
+      "name": "Cabelo",
+      "price": 20,
+      "duration": 30
+    },
+    {
+      "id": "3",
+      "name": "Barba + Cabelo",
+      "price": 35,
+      "duration": 45
+    }
+  ],
+  "appointments": [
+    {
+      "id": "1",
+      "barberId": "1",
+      "serviceId": "1",
+      "name": "Glayson",
+      "phone": "(12) 32132-1443",
+      "date": "2024-06-11",
+      "time": "11:30"
+    },
+    {
+      "id": "2",
+      "barberId": "1",
+      "serviceId": "1",
+      "name": "Murollo",
+      "phone": "(12) 34837-2594",
+      "date": "2024-06-10",
+      "time": "16:30"
+    },
+    {
+      "id": "3",
+      "barberId": "2",
+      "serviceId": "1",
+      "name": "Tas Mania",
+      "phone": "(30) 84570-9843",
+      "date": "2024-06-28",
+      "time": "15:30"
+    },
+    {
+      "id": "7f47",
+      "barberId": "2",
+      "serviceId": "2",
+      "name": "Mani",
+      "phone": "(23) 48397-5498",
+      "date": "2024-06-11",
+      "time": "08:00"
+    },
+    {
+      "id": "4724",
+      "barberId": "1",
+      "serviceId": "1",
+      "name": "Glayson",
+      "phone": "(09) 87480-2345",
+      "date": "2024-06-12",
+      "time": "08:30"
+    }
+  ]
+}

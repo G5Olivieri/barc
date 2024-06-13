@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.form-group {
+  @apply flex flex-col gap-1;
+}
+
+.form-control {
+  @apply border border-zinc-900 py-2 px-3 rounded bg-white text-zinc-900 placeholder-zinc-900 disabled:bg-zinc-400 disabled:text-zinc-100 disabled:placeholder-zinc-100 disabled:border-zinc-400
+}
+
+.btn-primary {
+  @apply bg-zinc-900 text-zinc-100 py-2 px-3 rounded hover:bg-zinc-900/90
+}

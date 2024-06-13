@@ -1,4 +1,4 @@
-from datetime import date, datetime, timezone, time
+from datetime import date, datetime, timezone 
 from typing import Annotated, List
 from uuid import UUID
 
@@ -59,8 +59,10 @@ async def get_barber(
 
 
 def validate_from_appointment(
-    time: TimeOfDay, appointment: Appointment, service: Service
+    time: TimeOfDay, time_range_end: TimeOfDay, appointment: Appointment, service: Service
 ):
+    if time_range_end < time.add_minutes(service.duration):
+        return False
     appointment_time = TimeOfDay.from_datetime(appointment.date_time)
     if (
         time == appointment_time
@@ -77,9 +79,9 @@ def validate_from_appointment(
 
 
 def validate_availability(
-    time: TimeOfDay, appointments: List[Appointment], service: Service
+    time: TimeOfDay, time_range_end: TimeOfDay, appointments: List[Appointment], service: Service
 ):
-    return all([validate_from_appointment(time, a, service) for a in appointments])
+    return all([validate_from_appointment(time, time_range_end, a, service) for a in appointments])
 
 
 @routers.get("/{barber_id}/availability")
@@ -118,8 +120,8 @@ async def get_barber_availability(
         availabilities.extend(
             [
                 t
-                for t in time_range.spread(service.duration)
-                if validate_availability(t, appointments, service)
+                for t in time_range.spread(30)
+                if validate_availability(t, time_range.end, appointments, service)
             ]
         )
     return availabilities

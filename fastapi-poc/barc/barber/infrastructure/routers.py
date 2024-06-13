@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime, timezone, time
 from typing import Annotated, List
 from uuid import UUID
 
@@ -108,7 +108,13 @@ async def get_barber_availability(
     if weekday not in barber.weekdays:
         return []
     availabilities = []
+    now = datetime.now(timezone.utc)
+    time_of_day = TimeOfDay(now.hour - 3, 0)
     for time_range in barber.officehours:
+        if time_range.end < time_of_day:
+            continue
+        if time_range.start < time_of_day:
+            time_range.start = time_of_day
         availabilities.extend(
             [
                 t

@@ -60,4 +60,8 @@ export class Time {
   public static fromMinutes(minutes: number) {
     return new Time(Math.floor(minutes / 60) % 24, minutes % 60);
   }
+
+  public static fromDate(date: Date) {
+    return new Time(date.getUTCHours(), date.getUTCMinutes());
+  }
 }

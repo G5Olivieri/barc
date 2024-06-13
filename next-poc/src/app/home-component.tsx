@@ -43,7 +43,9 @@ export default function HomeComponent({ barbers }: { barbers: Barber[] }) {
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/barbers/${barberSelect?.id}/availability?service_id=${serviceSelect?.id}&date=${formatDate(date, "yyyy-MM-dd")}`,
     ).then((r) => r.json() as Promise<{ hour: number; minute: number }[]>);
     setTimeButtons(
-      availabilities.map((a) => new Time(a.hour, a.minute).toString()),
+      availabilities
+        .map((a) => new Time(a.hour, a.minute))
+        .map((t) => t.toString()),
     );
   };
 

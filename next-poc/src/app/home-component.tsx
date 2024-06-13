@@ -77,7 +77,7 @@ export default function HomeComponent({ barbers }: { barbers: Barber[] }) {
         <div className="form-group">
           <label htmlFor="barber-select">Barbeiro</label>
           <select
-            className="form-control"
+            className="form-control w-full"
             name="barber"
             id="barber-select"
             value={barberSelect?.id || ""}
@@ -95,7 +95,7 @@ export default function HomeComponent({ barbers }: { barbers: Barber[] }) {
         <div className="form-group">
           <label htmlFor="service-select">Serviço</label>
           <select
-            className="form-control"
+            className="form-control w-full"
             name="service"
             id="service-select"
             value={serviceSelect?.id || ""}
@@ -115,7 +115,7 @@ export default function HomeComponent({ barbers }: { barbers: Barber[] }) {
         <div className="form-group">
           <label htmlFor="date-input">Data</label>
           <DatePicker
-            className="form-control"
+            className="form-control w-full"
             name="date"
             id="date-input"
             value={dateInput}

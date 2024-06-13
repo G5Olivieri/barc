@@ -1,5 +1,7 @@
 "use client";
 
+import { PriceInput } from "@/app/components/price-input";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 type NewServiceFormProps = {};
@@ -11,6 +13,7 @@ type InputData = {
 };
 
 export const NewServiceForm: React.FC<NewServiceFormProps> = ({}) => {
+  const [price, setPrice] = useState("" as string);
   const { register, handleSubmit } = useForm<InputData>();
 
   const onSubmit = handleSubmit(async (data) => {
@@ -25,7 +28,10 @@ export const NewServiceForm: React.FC<NewServiceFormProps> = ({}) => {
         "Content-Type": "application/json",
         Authorization: `Bearer ${jwt}`,
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify({
+        ...data,
+        "price": price.replaceAll(".", "").replaceAll(",", "."),
+      }),
     });
 
     // eslint-disable-next-line react-compiler/react-compiler
@@ -45,12 +51,11 @@ export const NewServiceForm: React.FC<NewServiceFormProps> = ({}) => {
       </div>
       <div className="form-group">
         <label htmlFor="price-input">Preço</label>
-        <input
+        <PriceInput
           className="form-control"
-          type="text"
           id="price-input"
-          inputMode="numeric"
-          {...register("price", { required: true })}
+          value={price}
+          onChange={(price) => setPrice(price)}
         />
       </div>
       <div className="form-group">

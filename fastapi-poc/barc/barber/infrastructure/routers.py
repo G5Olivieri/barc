@@ -1,4 +1,4 @@
-from datetime import date, datetime, timezone 
+from datetime import date, datetime, timezone
 from typing import Annotated, List
 from uuid import UUID
 
@@ -59,15 +59,16 @@ async def get_barber(
 
 
 def validate_from_appointment(
-    time: TimeOfDay, time_range_end: TimeOfDay, appointment: Appointment, service: Service
+    time: TimeOfDay,
+    time_range_end: TimeOfDay,
+    appointment: Appointment,
+    service: Service,
 ):
     if time_range_end < time.add_minutes(service.duration):
         return False
     appointment_time = TimeOfDay.from_datetime(appointment.date_time)
-    if (
-        time == appointment_time
-        and time.add_minutes(service.duration) == appointment_time
-    ):
+    print(time, appointment_time)
+    if time == appointment_time:
         return False
     if TimeRange(time, time.add_minutes(service.duration)).is_between(appointment_time):
         return False
@@ -79,9 +80,17 @@ def validate_from_appointment(
 
 
 def validate_availability(
-    time: TimeOfDay, time_range_end: TimeOfDay, appointments: List[Appointment], service: Service
+    time: TimeOfDay,
+    time_range_end: TimeOfDay,
+    appointments: List[Appointment],
+    service: Service,
 ):
-    return all([validate_from_appointment(time, time_range_end, a, service) for a in appointments])
+    return all(
+        [
+            validate_from_appointment(time, time_range_end, a, service)
+            for a in appointments
+        ]
+    )
 
 
 @routers.get("/{barber_id}/availability")
@@ -111,7 +120,13 @@ async def get_barber_availability(
         return []
     availabilities = []
     now = datetime.now(timezone.utc)
-    time_of_day = TimeOfDay(now.hour - 3, 0)
+    hour = now.hour - 3
+    minute = 0
+    if 0 < now.minute < 30:
+        minute = 30
+    elif 30 <= now.minute:
+        hour += 1
+    time_of_day = TimeOfDay(hour, minute)
     for time_range in barber.officehours:
         if time_range.end < time_of_day:
             continue

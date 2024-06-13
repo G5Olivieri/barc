@@ -28,7 +28,7 @@ export class Time {
 
   public toDate(date: Date) {
     const newDate = new Date(date);
-    newDate.setUTCHours(this.hour, this.minute, 0, 0);
+    newDate.setHours(this.hour, this.minute, 0, 0);
     return newDate;
   }
 

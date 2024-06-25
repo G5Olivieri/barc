@@ -17,3 +17,12 @@ class SQLAlchemyService(Base):
         return Service(
             id=self.id, name=self.name, price=self.price, duration=self.duration
         )
+
+    @classmethod
+    def from_domain(cls, service: Service) -> "SQLAlchemyService":
+        return cls(
+            id=service.id,
+            name=service.name,
+            price=service.price,
+            duration=service.duration,
+        )

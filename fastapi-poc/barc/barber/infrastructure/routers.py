@@ -1,4 +1,4 @@
-from datetime import date, datetime, timezone
+from datetime import date as libdate, datetime, timezone, timedelta
 from typing import Annotated, List
 from uuid import UUID
 
@@ -58,6 +58,7 @@ async def get_barber(
     return await barber_repository.get_by_id(barber_id)
 
 
+# TODO: unittest
 def validate_from_appointment(
     time: TimeOfDay,
     time_range_end: TimeOfDay,
@@ -67,7 +68,6 @@ def validate_from_appointment(
     if time_range_end < time.add_minutes(service.duration):
         return False
     appointment_time = TimeOfDay.from_datetime(appointment.date_time)
-    print(time, appointment_time)
     if time == appointment_time:
         return False
     if TimeRange(time, time.add_minutes(service.duration)).is_between(appointment_time):
@@ -97,7 +97,7 @@ def validate_availability(
 async def get_barber_availability(
     barber_id: UUID,
     service_id: UUID,
-    date: date,
+    date: libdate,
     barber_repository: Annotated[BarberRepository, Depends(get_barber_repository)],
     service_repository: Annotated[ServiceRepository, Depends(get_service_repository)],
     appointment_repository: Annotated[
@@ -119,19 +119,21 @@ async def get_barber_availability(
     if weekday not in barber.weekdays:
         return []
     availabilities = []
-    now = datetime.now(timezone.utc)
-    hour = now.hour - 3
+    now = datetime.now(timezone.utc) - timedelta(hours=3)
+    hour = now.hour
     minute = 0
     if 0 < now.minute < 30:
         minute = 30
     elif 30 <= now.minute:
         hour += 1
     time_of_day = TimeOfDay(hour, minute)
+    today = (datetime.now() - timedelta(hours=3)).date()
     for time_range in barber.officehours:
-        if time_range.end < time_of_day:
-            continue
-        if time_range.start < time_of_day:
-            time_range.start = time_of_day
+        if today == date:
+            if time_range.end < time_of_day:
+                continue
+            if time_range.start < time_of_day:
+                time_range.start = time_of_day
         availabilities.extend(
             [
                 t

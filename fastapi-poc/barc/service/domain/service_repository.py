@@ -1,16 +1,7 @@
 from uuid import UUID
-from decimal import Decimal
-from dataclasses import dataclass
 from abc import ABC, abstractmethod
 from typing import List
 from barc.service.domain.service import Service
-
-
-@dataclass
-class CreateService:
-    name: str
-    duration: int
-    price: Decimal
 
 
 class ServiceRepository(ABC):
@@ -23,5 +14,5 @@ class ServiceRepository(ABC):
         raise RuntimeError("Method not implemented")
 
     @abstractmethod
-    async def create(self, service: CreateService) -> UUID:
+    async def save(self, service: Service) -> UUID:
         raise RuntimeError("Method not implemented")

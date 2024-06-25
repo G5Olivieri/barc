@@ -64,4 +64,8 @@ export class Time {
   public static fromDate(date: Date) {
     return new Time(date.getUTCHours(), date.getUTCMinutes());
   }
+
+  public static fromObject(obj: { hour: number; minute: number }) {
+    return new Time(obj.hour, obj.minute);
+  }
 }

@@ -1,9 +1,10 @@
 from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
+from sqlalchemy.dialects.postgresql import insert
 from barc.service.infrastructure.sqlalchemy_service import SQLAlchemyService
 from barc.service.domain.service import Service
-from barc.service.domain.service_repository import ServiceRepository, CreateService
+from barc.service.domain.service_repository import ServiceRepository
 
 
 class SQLAlchemyServiceRepository(ServiceRepository):
@@ -36,9 +37,24 @@ class SQLAlchemyServiceRepository(ServiceRepository):
                 price=row.price,
             )
 
-    async def create(self, create_service: CreateService) -> UUID:
+    async def save(self, service: Service) -> UUID:
         async with self.__session() as session:
-            service = SQLAlchemyService(**create_service.dict())
-            session.add(service)
+            insert_stmt = insert(SQLAlchemyService).values(
+                {
+                    "id": service.id,
+                    "name": service.name,
+                    "price": service.price,
+                    "duration": service.duration,
+                }
+            )
+            upsert_stmt = insert_stmt.on_conflict_do_update(
+                constraint="service_pkey",
+                set_={
+                    "name": insert_stmt.excluded.name,
+                    "price": insert_stmt.excluded.price,
+                    "duration": insert_stmt.excluded.duration,
+                },
+            )
+            await session.execute(upsert_stmt)
             await session.commit()
             return service.id

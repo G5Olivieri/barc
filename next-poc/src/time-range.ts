@@ -1,30 +1,38 @@
-import { Time } from "./time";
+import {
+  Time,
+  addMinutes,
+  buildTimeFromString,
+  isBefore,
+  timeToString,
+} from "./time";
 
-export class TimeRange {
-  constructor(
-    public start: Time,
-    public end: Time,
-  ) {}
+export type TimeRange = {
+  start: Time;
+  end: Time;
+};
 
-  spread(step = 30): Time[] {
-    const hours = [];
-    let current = this.start.clone();
-    while (current.isBefore(this.end)) {
-      hours.push(current.clone());
-      current = current.addMinutes(step);
-      if (hours.length > (24 * 60) / step) {
-        return hours;
-      }
+export function spread(timeRange: TimeRange, step = 30): Time[] {
+  const hours = [];
+  let current = timeRange.start;
+  while (isBefore(current, timeRange.end)) {
+    hours.push(current);
+    current = addMinutes(current, step);
+    if (hours.length > (24 * 60) / step) {
+      return hours;
     }
-    return hours;
   }
+  return hours;
+}
 
-  public static fromString(str: string): TimeRange {
-    const [start, end] = str.split("-").map(Time.fromString);
-    return new TimeRange(start, end);
-  }
+export function newTimeRange(start: Time, end: Time) {
+  return { start, end };
+}
 
-  public toString() {
-    return `${this.start.toString()}-${this.end.toString()}`;
-  }
+export function fromString(str: string): TimeRange {
+  const [start, end] = str.split("-").map(buildTimeFromString);
+  return newTimeRange(start, end);
+}
+
+export function timeRangeToString(timeRange: TimeRange): string {
+  return `${timeToString(timeRange.start)}-${timeToString(timeRange.end)}`;
 }

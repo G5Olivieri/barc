@@ -1,38 +1,38 @@
-import { Barber, Service } from "@/app/types";
+import { fetchBarberById } from "@/barber";
+import { fetchServices } from "@/service";
+import { UUID } from "crypto";
 import { cookies } from "next/headers";
-import { BarberForm } from "../components/form";
-import { babelIncludeRegexes } from "next/dist/build/webpack-config";
-import { Time } from "@/time";
 import { UpdateBarberForm } from "./form";
 
 export default async function BarberPage({
   params: { id },
 }: {
-  params: { id: string };
+  params: { id: UUID };
 }) {
   const jwt = cookies().get("jwt");
 
-  const barber = await fetch(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/barbers/${id}`,
-    {
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-      },
-    },
-  ).then((res) => res.json() as Promise<Barber>);
+  if (!jwt) {
+    return "Unauthorized";
+  }
 
-  const services = await fetch(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/services`,
-    {
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-      },
+  const barber = await fetchBarberById(id, {
+    headers: {
+      Authorization: `Bearer ${jwt.value}`,
     },
-  ).then((res) => res.json() as Promise<Service[]>);
+    cache: "no-cache",
+  });
+
+  const services = await fetchServices({
+    headers: {
+      Authorization: `Bearer ${jwt.value}`,
+    },
+    cache: "no-cache",
+  });
 
   return (
     <div className="flex flex-col py-10 px-4 gap-4">
       <h1 className="text-2xl">Atualizar barbeiro</h1>
+      <button type="button" disabled className="bg-red-700 text-white py-2 rounded disabled:opacity-20">DELETAR</button>
       <UpdateBarberForm barber={barber} services={services} />
     </div>
   );

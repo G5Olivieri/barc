@@ -1,22 +1,23 @@
-import { Service } from "@/app/types";
-import { UpdateServiceForm } from "./form";
+import { fetchServiceById } from "@/service";
+import { UUID } from "crypto";
 import { cookies } from "next/headers";
+import { UpdateServiceForm } from "./form";
 
 export default async function ServicePage({
   params: { id },
 }: {
-  params: { id: string };
+  params: { id: UUID };
 }) {
   const jwt = cookies().get("jwt");
 
-  const service = await fetch(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/services/${id}`,
-    {
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-      },
+  if (!jwt) {
+    return "Unauthorized";
+  }
+  const service = await fetchServiceById(id, {
+    headers: {
+      Authorization: `Bearer ${jwt.value}`,
     },
-  ).then((res) => res.json() as Promise<Service>);
+  });
 
   return (
     <div className="flex flex-col py-10 px-4 gap-4">

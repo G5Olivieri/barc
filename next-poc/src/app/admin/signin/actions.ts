@@ -1,23 +1,26 @@
 "use server";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
+import { signIn, Token } from "@/auth";
+
+const isToken = (token: any): token is Token => !("error" in token);
 
 export const signin = async (prevState: any, formData: FormData) => {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/token`,
-    {
-      method: "POST",
-      body: formData,
-    },
-  ).then((res) => res.json());
-  if (response.error) {
-    return { ...prevState, message: response.error };
+  if (!formData.has("username") || !formData.has("password")) {
+    return { ...prevState, message: "Please fill in both fields" };
   }
-  cookies().set("jwt", response.access_token, {
-    httpOnly: false,
-    secure: false,
-    maxAge: 60 * 60 * 24 * 7, // One week
-    path: "/",
+  const token = await signIn({
+    username: formData.get("username") as string,
+    password: formData.get("password") as string,
   });
-  redirect("/admin");
+  if (isToken(token)) {
+    cookies().set("jwt", token.accessToken, {
+      httpOnly: false,
+      secure: false,
+      maxAge: token.expiresIn,
+      path: "/",
+    });
+    return redirect("/admin");
+  }
+  return { ...prevState, message: (token as { error: string }).error };
 };

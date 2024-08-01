@@ -3,10 +3,10 @@ import { TimeRange } from "@/time-range";
 
 describe("Time", () => {
   it("spread", () => {
-    const start = new Time(8, 0);
-    const end = new Time(12, 0);
+    const start = newTime(8, 0);
+    const end = newTime(12, 0);
     const step = 30;
-    const timeRange = new TimeRange(start, end);
+    const timeRange = newTimeRange(start, end);
     const result = timeRange.spread(step);
     expect(result).toHaveLength(8);
     expect(result[0].toString()).toBe("08:00");

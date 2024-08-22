@@ -6,8 +6,8 @@ import { useForm } from "react-hook-form";
 
 export type InputData = {
   name: string;
-  price: string;
-  duration: string;
+  price: number;
+  duration: number;
 };
 
 type ServiceFormProps = {
@@ -21,11 +21,19 @@ export const ServiceForm: React.FC<ServiceFormProps> = ({
   submitMessage,
   onSubmit,
 }) => {
-  const [price, setPrice] = useState(defaultValues?.price ?? "");
+  const [price, setPrice] = useState(
+    // TODO: use a better way to format the price
+    defaultValues?.price?.toString().replaceAll(",", "").replace(".", ",") ??
+      "",
+  );
   const { register, handleSubmit } = useForm<InputData>({ defaultValues });
 
   const onSubmitInternal = handleSubmit((data) => {
-    onSubmit({ ...data, price });
+    onSubmit({
+      ...data,
+      price: parseFloat(price.replaceAll(".", "").replace(",", ".")),
+      duration: Number(data.duration),
+    });
   });
 
   return (

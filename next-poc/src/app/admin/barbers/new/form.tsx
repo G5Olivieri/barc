@@ -1,53 +1,50 @@
 "use client";
-import { Service } from "@/app/types";
 import React from "react";
 import { BarberForm, InputData } from "../components/form";
+import { Service } from "@/service";
+import { createBarber } from "@/barber";
 
 type NewBarberFormProps = {
   services: Service[];
 };
+
 export const NewBarberForm: React.FC<NewBarberFormProps> = ({ services }) => {
+  // TODO: use form action
   const onSubmit = async (data: InputData) => {
     const {
       name,
-      officehoursEnd,
-      officehoursStart,
-      lunchTimeEnd,
-      lunchTimeStart,
-      selectedDays,
-      selectedServices,
+      endOffice,
+      startOffice,
+      endLunch,
+      startLunch,
+      weekdays,
+      services: selectedServices,
     } = data;
-    const officehours = [
+    await createBarber(
       {
-        start: { hour: officehoursStart.hour, minute: officehoursStart.minute },
-        end: { hour: lunchTimeStart.hour, minute: lunchTimeStart.minute },
+        name,
+        availableDays: weekdays,
+        startOffice,
+        endOffice,
+        startLunch,
+        endLunch,
+        services: selectedServices,
       },
       {
-        start: { hour: lunchTimeEnd.hour, minute: lunchTimeEnd.minute },
-        end: { hour: officehoursEnd.hour, minute: officehoursEnd.minute },
+        headers: {
+          Authorization: `Bearer ${
+            document.cookie
+              .split(";")
+              .map((c) => c.trim())
+              .find((c) => c.startsWith("jwt="))
+              ?.split("=")[1]
+          }`,
+        },
       },
-    ];
-    await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/barbers`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${
-          document.cookie
-            .split(";")
-            .map((c) => c.trim())
-            .find((c) => c.startsWith("jwt="))
-            ?.split("=")[1]
-        }`,
-      },
-      body: JSON.stringify({
-        name: data.name,
-        officehours,
-        weekdays: selectedDays.sort((a, b) => a - b),
-        services: selectedServices.map((s) => s.value),
-      }),
+    ).then(() => {
+      // eslint-disable-next-line react-compiler/react-compiler
+      window.location.href = "/admin/barbers";
     });
-    // eslint-disable-next-line react-compiler/react-compiler
-    window.location.href = "/admin/barbers";
   };
 
   return (

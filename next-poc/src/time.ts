@@ -1,71 +1,56 @@
-export class Time {
-  constructor(
-    public readonly hour: number,
-    public readonly minute: number,
-  ) {
-    if (hour < 0 || hour > 23) {
-      throw new Error("Invalid hour");
-    }
-    if (minute < 0 || minute > 59) {
-      throw new Error("Invalid minute");
-    }
-  }
+export type Time = {
+  hour: number;
+  minute: number;
+};
 
-  public minusMinutes(minutes: number) {
-    if (this.totalMinutes < minutes) {
-      return Time.fromMinutes(24 * 60 + this.totalMinutes - minutes);
-    }
-    return Time.fromMinutes(this.totalMinutes - minutes);
-  }
+export function totalMinutes(time: Time): number {
+  return time.hour * 60 + time.minute;
+}
 
-  public addMinutes(minutes: number) {
-    return Time.fromMinutes(this.totalMinutes + minutes);
-  }
+export function fromMinutes(minutes: number): Time {
+  const hour = Math.floor(minutes / 60) % 24;
+  const minute = minutes % 60;
+  return { hour, minute };
+}
 
-  public equals(other: Time) {
-    return this.hour === other.hour && this.minute === other.minute;
+export function minusMinutes(time: Time, minutes: number): Time {
+  if (totalMinutes(time) < minutes) {
+    return fromMinutes(24 * 60 + totalMinutes(time) - minutes);
   }
+  return fromMinutes(totalMinutes(time) - minutes);
+}
 
-  public toDate(date: Date) {
-    const newDate = new Date(date);
-    newDate.setHours(this.hour, this.minute, 0, 0);
-    return newDate;
-  }
+export function addMinutes(time: Time, minutes: number): Time {
+  return fromMinutes(totalMinutes(time) + minutes);
+}
 
-  public isAfter(other: Time) {
-    return this.totalMinutes > other.totalMinutes;
-  }
+export function equals(a: Time, b: Time): boolean {
+  return a.hour === b.hour && a.minute === b.minute;
+}
 
-  public isBefore(other: Time) {
-    return this.totalMinutes < other.totalMinutes;
-  }
+export function timeToDate(time: Time, date: Date): Date {
+  const newDate = new Date(date);
+  newDate.setHours(time.hour, time.minute, 0, 0);
+  return newDate;
+}
 
-  public get totalMinutes() {
-    return this.hour * 60 + this.minute;
-  }
+export function isAfter(a: Time, b: Time): boolean {
+  return totalMinutes(a) > totalMinutes(b);
+}
 
-  public clone() {
-    return new Time(this.hour, this.minute);
-  }
+export function isBefore(a: Time, b: Time): boolean {
+  return totalMinutes(a) < totalMinutes(b);
+}
 
-  public toString() {
-    return `${this.hour.toString().padStart(2, "0")}:${this.minute.toString().padStart(2, "0")}`;
-  }
+export function buildTimeFromString(time: string): Time {
+  const [hour, minute] = time.split(":").map(Number);
+  return { hour, minute };
+}
 
-  public static fromString(str: string) {
-    const [hour, minute] = str.split(":").map(Number);
-    return new Time(hour, minute);
-  }
+export function timeToString(time: Time): string {
+  return `${String(time.hour).padStart(2, "0")}:${String(time.minute).padStart(2, "0")}`;
+}
 
-  public static fromMinutes(minutes: number) {
-    return new Time(Math.floor(minutes / 60) % 24, minutes % 60);
-  }
-
-  public static fromDate(date: Date) {
-    return new Time(date.getUTCHours(), date.getUTCMinutes());
-  }
-
-  public static fromObject(obj: { hour: number; minute: number }) {
-    return new Time(obj.hour, obj.minute);
-  }
+export function newTime(hour: number, minute: number): Time {
+  return { hour, minute };
 }

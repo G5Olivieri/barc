@@ -1,15 +1,14 @@
 "use client";
-import { TimeRange } from "@/time-range";
+import { minusMinutes, Time, timeToDate, timeToString } from "@/time";
 import { formatDate, isAfter, isBefore, isToday, startOfToday } from "date-fns";
 import Link from "next/link";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useState } from "react";
+import { Barber, fetchAvailabilities } from "../barber";
+import { Nullable } from "../nullable";
+import { Service } from "../service";
 import { DatePicker } from "./components/datepicker";
-import { Barber, Nullable, Service } from "./types";
 
-import "react-datepicker/dist/react-datepicker.css";
-import { Time } from "@/time";
-
-export default function HomeComponent({ barbers }: { barbers: Barber[] }) {
+export default function Booking({ barbers }: { barbers: Barber[] }) {
   const [barberSelect, setBarberSelect] = useState<Nullable<Barber>>(null);
   const [serviceSelect, setServiceSelect] = useState<Nullable<Service>>(null);
   const [dateInput, setDateInput] = useState<Nullable<Date>>(null);
@@ -39,14 +38,12 @@ export default function HomeComponent({ barbers }: { barbers: Barber[] }) {
     setTimeButtons([]);
     setDateInput(date);
 
-    const availabilities = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/barbers/${barberSelect?.id}/availability?service_id=${serviceSelect?.id}&date=${formatDate(date, "yyyy-MM-dd")}`,
-    ).then((r) => r.json() as Promise<{ hour: number; minute: number }[]>);
-    setTimeButtons(
-      availabilities
-        .map((a) => new Time(a.hour, a.minute))
-        .map((t) => t.toString()),
+    const availabilities = await fetchAvailabilities(
+      barberSelect!,
+      serviceSelect!.duration,
+      date,
     );
+    setTimeButtons(availabilities.map(timeToString));
   };
 
   const filterDate = (date: Date) => {
@@ -54,16 +51,16 @@ export default function HomeComponent({ barbers }: { barbers: Barber[] }) {
       return false;
     }
     const day = date.getDay();
-    if (!(barberSelect?.weekdays.includes(day) || false)) {
+    if (!(barberSelect?.availableDays.includes(day) || false)) {
       return false;
     }
-    const endOfOfficeDay = new Time(
-      barberSelect?.officehours.at(-1)?.end.hour!,
-      barberSelect?.officehours.at(-1)?.end.minute!,
-    );
+    const endOfOfficeDay = barberSelect?.endOffice;
     if (isToday(date) && endOfOfficeDay) {
       return isAfter(
-        endOfOfficeDay.minusMinutes(serviceSelect?.duration || 30).toDate(date),
+        timeToDate(
+          minusMinutes(endOfOfficeDay, serviceSelect?.duration || 30),
+          date,
+        ),
         new Date(),
       );
     }

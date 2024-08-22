@@ -1,6 +1,6 @@
 "use client";
 
-import { Service } from "@/app/types";
+import { Service, updateService } from "@/service";
 import { InputData, ServiceForm } from "../components/form";
 
 type UpdateServiceFormProps = {
@@ -17,22 +17,14 @@ export const UpdateServiceForm: React.FC<UpdateServiceFormProps> = ({
       .map((c) => c.trim())
       .find((c) => c.startsWith("jwt="))
       ?.split("=")[1];
-    await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/services/${service.id}`,
+    await updateService(
+      { id: service.id, name, duration, price },
       {
-        method: "PUT",
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${jwt}`,
         },
-        body: JSON.stringify({
-          name,
-          duration,
-          price: price.replaceAll(".", "").replaceAll(",", "."),
-        }),
       },
     );
-
     // eslint-disable-next-line react-compiler/react-compiler
     window.location.href = "/admin/services";
   };
@@ -43,8 +35,8 @@ export const UpdateServiceForm: React.FC<UpdateServiceFormProps> = ({
       onSubmit={onSubmit}
       defaultValues={{
         name: service.name,
-        duration: service.duration.toString(),
-        price: service.price.toString().replaceAll(",", ".").replace(".", ","),
+        duration: service.duration,
+        price: service.price,
       }}
     />
   );

@@ -1,5 +1,6 @@
 "use client";
 
+import { createService } from "@/service";
 import { InputData, ServiceForm } from "../components/form";
 
 type NewServiceFormProps = {};
@@ -12,19 +13,18 @@ export const NewServiceForm: React.FC<NewServiceFormProps> = ({}) => {
       .map((c) => c.trim())
       .find((c) => c.startsWith("jwt="))
       ?.split("=")[1];
-    await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/services`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${jwt}`,
-      },
-      body: JSON.stringify({
+    await createService(
+      {
         name,
+        price,
         duration,
-        price: price.replaceAll(".", "").replaceAll(",", "."),
-      }),
-    });
-
+      },
+      {
+        headers: {
+          authorization: `Bearer ${jwt}`,
+        },
+      },
+    );
     // eslint-disable-next-line react-compiler/react-compiler
     window.location.href = "/admin/services";
   };

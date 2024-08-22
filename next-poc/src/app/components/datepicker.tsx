@@ -67,7 +67,7 @@ const DatePickerGrid: React.FC<DatePickerGridProps> = ({
       {dates.map((date) => (
         <DatePickerGridCell
           disabled={!(filterDate && filterDate(date))}
-          className={`p-2 text-black hover:bg-zinc-300 ${isSameMonth(date, month) ? "" : "text-gray-400 hover:text-black"} disabled:text-gray-400 disabled:hover:bg-white`}
+          className={`p-2 text-black hover:bg-zinc-300 disabled:text-gray-400 disabled:hover:bg-white`}
           key={date.toISOString()}
           date={date}
           onClick={onClick}
